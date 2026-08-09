@@ -2,7 +2,7 @@
 
 Ein interaktives Entwicklungs-Image für Paperclip- und OpenClaw-Agenten. Es bringt die üblichen Werkzeuge zum Bearbeiten, Testen, Bauen und Ausrollen von Software mit. Der Arbeitsbereich wird immer vom aufrufenden System nach `/workspace` gemountet; dadurch bleiben Quellcode, virtuelle Umgebungen und lokale Build-Artefakte über Container-Neustarts erhalten.
 
-> **Sicherheitsgrenze:** Ein gemounteter Docker-Socket verleiht dem Container weitreichende Rechte auf dem Docker-Host. Er ist nur für vertrauenswürdige Agenten und isolierte Runner gedacht. Zugangsdaten niemals in das Image bauen oder in ein Image-Layer schreiben.
+> **Sicherheitsgrenze:** Ein gemounteter Docker-Socket verleiht dem Container weitreichende Rechte auf den Docker-Host. Er ist nur für vertrauenswürdige Agenten und isolierte Runner gedacht. Zugangsdaten niemals in das Image bauen oder in ein Image-Layer schreiben.
 
 ## Enthaltene Werkzeuge
 
@@ -12,6 +12,8 @@ Ein interaktives Entwicklungs-Image für Paperclip- und OpenClaw-Agenten. Es bri
 | Source Control und Secrets | Git, OpenSSH-Client, GnuPG, OpenSSL, rsync |
 | Build | make, GCC/G++, build-essential, ShellCheck |
 | JavaScript | Node.js 22 LTS, npm, Corepack (aktiviert: `pnpm` und `yarn`) |
+| Node-Versionierer | `nvm` |
+| Multi-Tool-Versionierer | `tenv` von <https://github.com/tofuutils/tenv> |
 | Python | Python 3, pip, venv |
 | Container | Docker CLI (`docker-ce-cli`), Buildx über die Docker-CLI |
 | Plattform | kubectl, Helm, Terraform |
@@ -98,8 +100,3 @@ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock agent-helper-dev:te
 ```
 
 Offene Designentscheidungen und Verbesserungsvorschläge stehen in [`TBD.md`](TBD.md).
-
-
-## Updates
-- Added `nvm` and `tenv` to the version-manager list.
-- `tenv` source: https://github.com/tofuutils/tenv
