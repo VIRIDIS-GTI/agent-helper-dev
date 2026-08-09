@@ -98,3 +98,8 @@ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock agent-helper-dev:te
 ```
 
 Offene Designentscheidungen und Verbesserungsvorschläge stehen in [`TBD.md`](TBD.md).
+
+
+## Updates
+- Added `nvm` and `tenv` to the version-manager list.
+- `tenv` source: https://github.com/tofuutils/tenv

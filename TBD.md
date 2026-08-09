@@ -27,3 +27,7 @@ Im aktuellen VIRIDIS-Dev-Bot-Pod ist die Docker-CLI vorhanden (`Docker 27.5.1`),
 - [ ] Socket-Integrationstest auf einem Runner mit vorhandenem `/var/run/docker.sock` ausführen.
 - [ ] CI und GHCR-Publishing nach Entscheidung zu Punkt 1 einrichten.
 - [ ] SHA256-Verifikation für externe Tool-Downloads ergänzen.
+
+
+## Resolution
+- Keep the remote base and apply local updates for nvm/tenv and docs.

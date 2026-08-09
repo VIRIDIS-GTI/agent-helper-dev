@@ -71,3 +71,5 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 USER agent
 WORKDIR /workspace
 CMD ["bash"]
+
+RUN curl -fsSL https://github.com/tofuutils/tenv/releases/latest/download/tenv_linux_amd64.tar.gz | tar -xz -C /usr/local/bin tenv || true
