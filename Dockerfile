@@ -68,8 +68,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Install nvm and tenv for Node/tool version management.
+RUN su - agent -c 'curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash' \
+    && su - agent -c 'bash -lc ". \"$HOME/.nvm/nvm.sh\" && nvm install --lts && nvm alias default node && corepack enable"' \
+    && curl -fsSL https://github.com/tofuutils/tenv/releases/latest/download/tenv_linux_amd64.tar.gz | tar -xz -C /usr/local/bin tenv || true
+
 USER agent
 WORKDIR /workspace
 CMD ["bash"]
-
-RUN curl -fsSL https://github.com/tofuutils/tenv/releases/latest/download/tenv_linux_amd64.tar.gz | tar -xz -C /usr/local/bin tenv || true

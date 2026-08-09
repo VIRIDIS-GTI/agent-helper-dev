@@ -12,8 +12,8 @@ Ein interaktives Entwicklungs-Image für Paperclip- und OpenClaw-Agenten. Es bri
 | Source Control und Secrets | Git, OpenSSH-Client, GnuPG, OpenSSL, rsync |
 | Build | make, GCC/G++, build-essential, ShellCheck |
 | JavaScript | Node.js 22 LTS, npm, Corepack (aktiviert: `pnpm` und `yarn`) |
-| Node-Versionierer | `nvm` |
-| Multi-Tool-Versionierer | `tenv` von <https://github.com/tofuutils/tenv> |
+| Node-Versionierer | `nvm` (installiert im Dockerfile) |
+| Multi-Tool-Versionierer | `tenv` von <https://github.com/tofuutils/tenv> (installiert im Dockerfile) |
 | Python | Python 3, pip, venv |
 | Container | Docker CLI (`docker-ce-cli`), Buildx über die Docker-CLI |
 | Plattform | kubectl, Helm, Terraform |
