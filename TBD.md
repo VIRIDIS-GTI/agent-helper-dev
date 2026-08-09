@@ -1,21 +1,29 @@
-# TBD.md - Agent Helper Dev Docker Image
+# TBD — Agent Helper Dev Docker Image
 
-## Open Questions & Improvements
+## Verifizierte Umgebungsnotiz (2026-08-09)
 
-1. **Base Image Version**: Should we use a more recent Ubuntu LTS (24.04) instead of 22.04? 22.04 is still supported until April 2027.
+Im aktuellen VIRIDIS-Dev-Bot-Pod ist die Docker-CLI vorhanden (`Docker 27.5.1`), aber `/var/run/docker.sock` fehlt und es läuft kein Docker-Daemon. Ein lokaler Build oder Socket-Integrationstest ist in diesem Pod deshalb nicht möglich. Die Test-Commands in der README sind für einen vertrauenswürdigen Docker-Runner vorbereitet.
 
-2. **NVM Installation**: The Dockerfile installs nvm via bash, but the container starts as `agent` user. Should we add `source ~/.nvm/nvm.sh` to `/home/agent/.bashrc` for persistent shell access?
+## Offene Entscheidungen
 
-3. **SSH Key Handling**: The README mentions `SSH_KEY` as an environment variable. Should we accept it as a file mount (e.g., `-v ~/.ssh/id_rsa:/home/agent/.ssh/id_rsa`) instead of environment variable?
+1. **Image-Publishing und CI:** Soll GitHub Actions auf jeden Push nach `main` nach `ghcr.io/viridis-gti/agent-helper-dev` bauen und versionierte Tags (SHA, SemVer, `latest`) veröffentlichen? Empfehlung: ja; `latest` nur zusätzlich zu unveränderlichen SHA-Tags.
+2. **Docker-Socket-Sicherheitsmodell:** Der Socket gibt effektiv Host-Root-Rechte. Soll die Nutzung nur durch einen dedizierten, kurzlebigen Runner erlaubt werden? Empfehlung: ja; kein Socket in normalen OpenClaw-/Paperclip-Workloads.
+3. **Ausführender Benutzer:** Das Image startet als UID 1000 (`agent`). Für einen Socket mit abweichender Gruppen-ID ist `--group-add "$(stat -c %g /var/run/docker.sock)"` nötig. Alternative: bewusst `--user 0` nur im privilegierten Build-Runner. Empfehlung: Gruppen-ID zur Laufzeit hinzufügen, root vermeiden.
+4. **Zusätzliche Sprach-Stacks:** Go, Rust, Java, PHP, Ruby, Datenbank-Clients, `gh`, `uv`, `poetry`, Ansible und Git LFS sind auf dem Dev Bot nicht standardmäßig als Befehl vorhanden. Sollen sie in eine zweite, größere Variante (`agent-helper-dev:full`) statt in das Basis-Image? Empfehlung: ja, um die Basis klein und patchbar zu halten.
+5. **Versionspflege:** Node, kubectl, Helm, Terraform und yq sind als Dockerfile-ARGs fixiert. Soll Dependabot/Renovate diese Werte aktualisieren und dafür einen Smoke-Test ausführen? Empfehlung: ja.
+6. **Tool-Download-Supply-Chain:** Die Upstream-Binaries werden über HTTPS geladen. Soll der Build zusätzlich SHA256-Prüfsummen prüfen? Empfehlung: ja, bevor das Image produktiv verwendet wird.
+7. **Secret-Übergabe:** Soll ein standardisiertes Runner-Wrapper-Skript ausschließlich SSH-Agent-Sockets und kurzlebige Token einreichen? Empfehlung: ja; keine dauerhaften private Keys per Environment.
 
-4. **Docker Socket Permissions**: The current setup mounts `/var/run/docker.sock`, but the `agent` user may need `docker` group membership for permission. Should we add `usermod -aG docker agent`?
+## Erledigt
 
-5. **Image Size Optimization**: The current Dockerfile installs many packages. Could we reduce size by using multi-stage builds or removing temporary dependencies after installation?
+- [x] Entwicklungs-Toolliste des Dev Bot geprüft und in `TOOLING.md` dokumentiert.
+- [x] Dockerfile auf Ubuntu 24.04 aktualisiert; enthält Node, pnpm/Corepack, Git, Python, Build-Tools, Docker CLI, kubectl, Helm, Terraform, yq und ffmpeg.
+- [x] README mit Volume-, Secret- und Docker-Socket-Sicherheitsmodell geschrieben.
+- [x] Docker-Socket im aktuellen Pod geprüft: nicht vorhanden; daher kein lokaler Docker-Build möglich.
 
-6. **Default Shell**: The `CMD ["bash"]` assumes bash. Should we support `sh` as default for minimalism?
+## Noch auszuführen
 
-## Action Items
-
-- [ ] Verify Docker socket permissions with `docker run` test
-- [ ] Test image build locally with `docker build -t agent-helper-dev .`
-- [ ] Confirm `lsb_release` is available in the base image (now included via `lsb-release` package)
+- [ ] Build und Tool-Smoketest auf einem vertrauenswürdigen Docker-Runner ausführen.
+- [ ] Socket-Integrationstest auf einem Runner mit vorhandenem `/var/run/docker.sock` ausführen.
+- [ ] CI und GHCR-Publishing nach Entscheidung zu Punkt 1 einrichten.
+- [ ] SHA256-Verifikation für externe Tool-Downloads ergänzen.
