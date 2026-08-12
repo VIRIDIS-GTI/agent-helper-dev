@@ -61,6 +61,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" -o /tmp/terraform.zip \
     && unzip -q /tmp/terraform.zip -d /usr/local/bin \
     && rm -f /tmp/terraform.zip \
+    && userdel -r ubuntu 2>/dev/null || true \
     && useradd --create-home --shell /bin/bash --uid 1000 agent \
     && install -d -o agent -g agent -m 0755 /workspace \
     && echo 'agent ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/agent \
