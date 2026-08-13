@@ -69,6 +69,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Betriebsanweisung fuer den AUFRUFENDEN Agenten (nicht fuer diesen Container
+# selbst) - liegt im Image, damit sie mit jedem Build/Update automatisch
+# aktuell bleibt, statt als Kopie an anderer Stelle zu veralten.
+COPY --chown=agent:agent AGENT_PROMPT.md /home/agent/AGENT_PROMPT.md
+
 # Install nvm and tenv for Node/tool version management.
 RUN su - agent -c 'curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash' \
     && su - agent -c 'bash -lc ". \"$HOME/.nvm/nvm.sh\" && nvm install --lts && nvm alias default node && corepack enable"' \
