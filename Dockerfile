@@ -13,6 +13,9 @@ ENV DEBIAN_FRONTEND=noninteractive \
     HOME=/workspace \
     PATH=/home/agent/.local/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
+# Remove the default ubuntu user that comes with Ubuntu 24.04 (UID 1000)
+RUN userdel -f -r ubuntu 2>/dev/null; true
+
 # Packages derived from the Dev Bot host inventory. See TOOLING.md for the
 # complete, intentionally curated package and command matrix.
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -52,16 +55,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get update \
     && apt-get install -y --no-install-recommends docker-ce-cli nodejs \
     && corepack enable \
-    && curl -fsSL "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl \
+    && curl -fsSL --retry 3 --retry-delay 5 "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl \
     && chmod 0755 /usr/local/bin/kubectl \
-    && curl -fsSL "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
+    && curl -fsSL --retry 3 --retry-delay 5 "https://get.helm.sh/helm-v${HELM_VERSION}-linux-amd64.tar.gz" \
        | tar -xz --strip-components=1 -C /usr/local/bin linux-amd64/helm \
-    && curl -fsSL "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -o /usr/local/bin/yq \
+    && curl -fsSL --retry 3 --retry-delay 5 "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" -o /usr/local/bin/yq \
     && chmod 0755 /usr/local/bin/yq \
-    && curl -fsSL "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" -o /tmp/terraform.zip \
+    && curl -fsSL --retry 3 --retry-delay 5 "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" -o /tmp/terraform.zip \
     && unzip -q /tmp/terraform.zip -d /usr/local/bin \
     && rm -f /tmp/terraform.zip \
-    && userdel -r ubuntu 2>/dev/null || true \
     && useradd --create-home --shell /bin/bash --uid 1000 agent \
     && install -d -o agent -g agent -m 0755 /workspace \
     && echo 'agent ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/agent \
@@ -77,7 +79,7 @@ COPY --chown=agent:agent AGENT_PROMPT.md /home/agent/AGENT_PROMPT.md
 # Install nvm and tenv for Node/tool version management.
 RUN su - agent -c 'curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash' \
     && su - agent -c 'bash -lc ". \"$HOME/.nvm/nvm.sh\" && nvm install --lts && nvm alias default node && corepack enable"' \
-    && curl -fsSL https://github.com/tofuutils/tenv/releases/latest/download/tenv_linux_amd64.tar.gz | tar -xz -C /usr/local/bin tenv || true
+    && curl -fsSL --retry 3 --retry-delay 5 https://github.com/tofuutils/tenv/releases/latest/download/tenv_linux_amd64.tar.gz | tar -xz -C /usr/local/bin tenv || true
 
 USER agent
 WORKDIR /workspace
